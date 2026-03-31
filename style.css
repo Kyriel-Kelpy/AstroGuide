@@ -1,29 +1,29 @@
 :root {
-  /* Dark Theme (Default) - Optimisation des contrastes secondaires */
+  /* Dark Theme (Default) */
   --bg-color: #0a0a1a;
   --text-color: #f3f4f6;
-  --subtext-color: #a78bfa; /* Un violet plus lisible que le précédent */
+  --subtext-color: #c4b5fd;
   --accent-color: #7c3aed;
-  --card-bg: rgba(30, 27, 75, 0.4);
-  --border-color: rgba(139, 92, 246, 0.2);
+  --card-bg: rgba(30, 27, 75, 0.6);
+  --border-color: rgba(139, 92, 246, 0.25);
   --input-bg: #0a0a1a;
-  --nav-inactive: rgba(91, 33, 182, 0.2);
-  --glow-color: rgba(139, 92, 246, 0.2);
+  --nav-inactive: rgba(91, 33, 182, 0.25);
+  --glow-color: rgba(139, 92, 246, 0.25);
   --passport-gradient: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #020617 100%);
 }
 
 [data-theme="light"] {
-  /* Light Theme (Parchment) - Amélioration de la lisibilité */
-  --bg-color: #fcfaf7; /* Un parchemin légèrement plus lumineux */
-  --text-color: #0f172a; /* Bleu-noir très profond pour un contraste maximal */
-  --subtext-color: #334155; /* Gris ardoise plus soutenu pour les descriptions */
-  --accent-color: #6d28d9; /* Un violet un peu plus sombre pour le mode clair */
-  --card-bg: rgba(255, 255, 255, 0.9); /* Plus d'opacité pour détacher la carte du fond */
-  --border-color: rgba(109, 40, 217, 0.2);
+  /* Light Theme - CONTRASTE AMÉLIORÉ */
+  --bg-color: #f8fafc;
+  --text-color: #020617; /* noir profond */
+  --subtext-color: #475569; /* gris lisible */
+  --accent-color: #5b21b6; /* violet plus foncé */
+  --card-bg: #ffffff; /* suppression transparence */
+  --border-color: rgba(91, 33, 182, 0.2);
   --input-bg: #ffffff;
-  --nav-inactive: rgba(109, 40, 217, 0.08);
-  --glow-color: rgba(109, 40, 217, 0.1);
-  --passport-gradient: linear-gradient(135deg, #ffffff 0%, #fcfaf7 50%, #f1f5f9 100%);
+  --nav-inactive: rgba(91, 33, 182, 0.08);
+  --glow-color: rgba(91, 33, 182, 0.15);
+  --passport-gradient: linear-gradient(135deg, #ffffff 0%, #f1f5f9 50%, #e2e8f0 100%);
 }
 
 body {
@@ -35,14 +35,16 @@ body {
   margin: 0;
 }
 
+/* CARDS */
 .glass-card {
   background-color: var(--card-bg);
   backdrop-filter: blur(12px);
   border: 1px solid var(--border-color);
   border-radius: 1.5rem;
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
 }
 
+/* NAV BUTTON */
 .btn-nav {
   display: flex;
   align-items: center;
@@ -69,6 +71,7 @@ body {
   transform: scale(1.05);
 }
 
+/* PRIMARY BUTTON */
 .btn-primary {
   background: linear-gradient(to right, var(--accent-color), #2563eb);
   color: white;
@@ -79,7 +82,7 @@ body {
   cursor: pointer;
   width: 100%;
   transition: transform 0.2s, box-shadow 0.2s;
-  box-shadow: 0 10px 15px -3px var(--glow-color);
+  box-shadow: 0 10px 20px var(--glow-color);
 }
 
 .btn-primary:hover {
@@ -90,6 +93,7 @@ body {
   transform: scale(0.98);
 }
 
+/* INPUT */
 .input-select {
   width: 100%;
   background-color: var(--input-bg);
@@ -103,10 +107,11 @@ body {
 }
 
 .input-select:focus {
-  ring: 2px solid var(--accent-color);
+  border-color: var(--accent-color);
+  box-shadow: 0 0 0 2px var(--glow-color);
 }
 
-/* Astral Passport Styles */
+/* PASSPORT */
 .passport-container {
   width: 350px;
   height: 550px;
@@ -117,7 +122,7 @@ body {
   display: flex;
   flex-direction: column;
   border: 1px solid #d4af37;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4);
   background: var(--passport-gradient);
 }
 
@@ -133,12 +138,13 @@ body {
   border: 1px solid rgba(212, 175, 55, 0.3);
 }
 
+/* TEXT PASSPORT */
 .passport-label {
   font-size: 8px;
   text-transform: uppercase;
   font-weight: bold;
   letter-spacing: 0.05em;
-  color: #7c3aed; /* On part sur le violet d'accent par défaut */
+  color: var(--accent-color);
   margin-bottom: 2px;
 }
 
@@ -150,31 +156,32 @@ body {
 }
 
 [data-theme="light"] .passport-value {
-  color: #1e293b;
+  color: #020617;
 }
 
 [data-theme="light"] .passport-label {
-  color: #6d28d9; /* Violet plus profond en mode clair */
+  color: #5b21b6;
 }
 
 [data-theme="light"] .passport-mrz {
-  color: #64748b; /* Gris plus lisible pour la zone machine en bas */
+  color: #475569;
 }
 
-/* Ajustement de la photo box pour le mode clair */
+/* PHOTO BOX LIGHT */
 [data-theme="light"] .passport-photo-box {
   background-color: #e2e8f0;
-  border: 1px solid rgba(109, 40, 217, 0.2);
+  border: 1px solid rgba(91, 33, 182, 0.2);
 }
 
+/* MRZ */
 .passport-mrz {
   font-family: monospace;
   font-size: 7px;
-  color: rgba(167, 139, 250, 0.5);
+  color: rgba(167, 139, 250, 0.7);
   line-height: 1.2;
 }
 
-/* Animations */
+/* ANIMATIONS */
 .fade-in {
   animation: fadeIn 0.5s ease-out forwards;
 }
@@ -184,7 +191,7 @@ body {
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* Sections visibility */
+/* SECTIONS */
 .section {
   display: none;
 }
