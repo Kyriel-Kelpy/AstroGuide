@@ -1,9 +1,7 @@
 import { ZODIAC_SIGNS } from './data.js';
 
 // --- State Management ---
-let currentTheme = 'dark';
 let isMuted = true;
-let currentSign = null;
 let userPhoto = null;
 let currentGender = 'Homme';
 
@@ -43,15 +41,13 @@ function updateIcon(el, name) {
     lucide.createIcons();
 }
 
-
-
 // --- Audio Logic ---
 function setupAudio() {
+    if (!audio) return;
     audio.volume = 0.3;
 
     muteToggle.addEventListener('click', () => {
         isMuted = !isMuted;
-
         if (isMuted) {
             audio.pause();
             updateIcon(muteIcon, 'volume-x');
@@ -83,7 +79,8 @@ function showSection(sectionId) {
     if (targetBtn) targetBtn.classList.add('active');
     
     if (sectionId === 'home') {
-        document.getElementById('zodiac-card-container').innerHTML = '';
+        const container = document.getElementById('zodiac-card-container');
+        if (container) container.innerHTML = '';
     }
 }
 
@@ -91,10 +88,14 @@ function showSection(sectionId) {
 function populateSelects() {
     const months = ["Janvier", "Février", "Mars", "Avril", "Mai", "Juin", "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre"];
     
-    months.forEach((m, i) => {
-        const opt = new Option(m, i + 1);
-        birthMonthSelect.add(opt);
-    });
+    if (birthMonthSelect) {
+        months.forEach((m, i) => {
+            birthMonthSelect.add(new Option(m, i + 1));
+        });
+
+        birthMonthSelect.addEventListener('change', updateDays);
+        updateDays();
+    }
 
     function updateDays() {
         const month = parseInt(birthMonthSelect.value);
@@ -108,17 +109,11 @@ function populateSelects() {
         }
     }
 
-    birthMonthSelect.addEventListener('change', updateDays);
-    updateDays();
-
     ZODIAC_SIGNS.forEach(sign => {
-        compSign1Select.add(new Option(`${sign.symbol} ${sign.name}`, sign.id));
-        compSign2Select.add(new Option(`${sign.symbol} ${sign.name}`, sign.id));
-        passSignSelect.add(new Option(`${sign.symbol} ${sign.name}`, sign.id));
+        if (compSign1Select) compSign1Select.add(new Option(`${sign.symbol} ${sign.name}`, sign.id));
+        if (compSign2Select) compSign2Select.add(new Option(`${sign.symbol} ${sign.name}`, sign.id));
+        if (passSignSelect) passSignSelect.add(new Option(`${sign.symbol} ${sign.name}`, sign.id));
     });
-    
-    compSign1Select.value = ZODIAC_SIGNS[0].id;
-    compSign2Select.value = ZODIAC_SIGNS[1].id;
 }
 
 // --- Sign Calculation ---
@@ -127,35 +122,39 @@ function getSignByDate(month, day) {
         if (sign.startMonth === sign.endMonth) {
             return month === sign.startMonth && day >= sign.startDay && day <= sign.endDay;
         }
-        if (sign.startMonth < sign.endMonth) {
-            return (month === sign.startMonth && day >= sign.startDay) || (month === sign.endMonth && day <= sign.endDay);
-        }
         return (month === sign.startMonth && day >= sign.startDay) || (month === sign.endMonth && day <= sign.endDay);
     }) || ZODIAC_SIGNS[0];
 }
 
 // --- Forms Logic ---
 function setupForms() {
-    findSignForm.addEventListener('submit', (e) => {
-        e.preventDefault();
-        const month = parseInt(birthMonthSelect.value);
-        const day = parseInt(birthDaySelect.value);
-        const sign = getSignByDate(month, day);
-        renderZodiacCard(sign);
-        showSection('result');
-    });
+    if (findSignForm) {
+        findSignForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const month = parseInt(birthMonthSelect.value);
+            const day = parseInt(birthDaySelect.value);
+            const sign = getSignByDate(month, day);
+            renderZodiacCard(sign);
+            showSection('result');
+        });
+    }
 
-    calculateCompBtn.addEventListener('click', () => {
-        const s1Id = compSign1Select.value;
-        const s2Id = compSign2Select.value;
-        const result = calculateCompatibility(s1Id, s2Id);
-        renderCompatibility(result);
-    });
+    if (calculateCompBtn) {
+        calculateCompBtn.addEventListener('click', () => {
+            const s1Id = compSign1Select.value;
+            const s2Id = compSign2Select.value;
+            const result = calculateCompatibility(s1Id, s2Id);
+            renderCompatibility(result);
+        });
+    }
 }
 
 function renderZodiacCard(sign) {
     const container = document.getElementById('zodiac-card-container');
-    const tpl = document.getElementById('tpl-zodiac-card').content.cloneNode(true);
+    const templateEl = document.getElementById('tpl-zodiac-card');
+    if (!container || !templateEl) return;
+
+    const tpl = templateEl.content.cloneNode(true);
     
     tpl.querySelector('.zodiac-symbol-glow').textContent = sign.symbol;
     tpl.querySelector('.zodiac-name').textContent = sign.name;
@@ -163,7 +162,6 @@ function renderZodiacCard(sign) {
     tpl.querySelector('.zodiac-planet').textContent = sign.rulingPlanet;
     tpl.querySelector('.zodiac-quote').textContent = `"${sign.quote}"`;
     tpl.querySelector('.zodiac-desc').textContent = sign.description;
-    tpl.querySelector('.zodiac-history').textContent = sign.history;
     
     const traitsContainer = tpl.querySelector('.zodiac-traits');
     sign.traits.forEach(t => {
@@ -171,23 +169,6 @@ function renderZodiacCard(sign) {
         span.className = "px-3 py-1 bg-blue-900/40 text-blue-200 rounded-lg text-sm border border-blue-500/20";
         span.textContent = t;
         traitsContainer.appendChild(span);
-    });
-
-    const compatPlus = tpl.querySelector('.zodiac-compat-plus');
-    const compatMinus = tpl.querySelector('.zodiac-compat-minus');
-    
-    ZODIAC_SIGNS.filter(s => sign.compatibleWith.includes(s.id)).forEach(s => {
-        const span = document.createElement('span');
-        span.className = "text-sm text-green-200/80";
-        span.textContent = `${s.symbol} ${s.name}`;
-        compatPlus.appendChild(span);
-    });
-
-    ZODIAC_SIGNS.filter(s => sign.lessCompatibleWith.includes(s.id)).forEach(s => {
-        const span = document.createElement('span');
-        span.className = "text-sm text-red-200/80";
-        span.textContent = `${s.symbol} ${s.name}`;
-        compatMinus.appendChild(span);
     });
 
     tpl.querySelector('.back-to-home').addEventListener('click', () => showSection('home'));
@@ -205,7 +186,7 @@ function renderExplorer() {
         btn.className = "glass-card p-6 flex flex-col items-center gap-3 transition-all hover:scale-105 active:scale-95";
         btn.innerHTML = `
             <span class="text-5xl" style="filter: drop-shadow(0 0 10px rgba(139, 92, 246, 0.2))">${sign.symbol}</span>
-            <span class="font-bold">${sign.name}</span>
+            <span class="font-bold text-white">${sign.name}</span>
             <span class="text-[10px] uppercase tracking-widest text-violet-400">${sign.element}</span>
         `;
         btn.addEventListener('click', () => {
@@ -216,23 +197,19 @@ function renderExplorer() {
     });
 }
 
-// --- Compatibility Logic ---
 function calculateCompatibility(s1Id, s2Id) {
     const s1 = ZODIAC_SIGNS.find(s => s.id === s1Id);
     const s2 = ZODIAC_SIGNS.find(s => s.id === s2Id);
-
-    if (s1Id === s2Id) return { percentage: 85, description: "Une connexion miroir intense. Vous vous comprenez sans parler." };
-    if (s1.compatibleWith.includes(s2Id)) return { percentage: 92, description: `Alliance céleste ! ${s1.compatibilityAnalysis}` };
-    if (s1.lessCompatibleWith.includes(s2Id)) return { percentage: 45, description: "Des défis à relever, mais rien n'est impossible avec de la patience." };
-    if (s1.element === s2.element) return { percentage: 80, description: "Une compréhension naturelle grâce à votre élément commun." };
-    
-    return { percentage: 60, description: "Une relation qui demande des compromis et une ouverture d'esprit." };
+    if (s1Id === s2Id) return { percentage: 85, description: "Une connexion miroir intense." };
+    if (s1.compatibleWith.includes(s2Id)) return { percentage: 92, description: "Alliance céleste !" };
+    return { percentage: 60, description: "Une relation qui demande des compromis." };
 }
 
 function renderCompatibility(result) {
     const container = document.getElementById('compatibility-result');
+    if (!container) return;
     container.innerHTML = `
-        <div class="flex flex-col items-center py-8">
+        <div class="flex flex-col items-center py-8 fade-in">
             <div class="relative w-48 h-48 mb-6">
                 <svg class="w-full h-full" viewBox="0 0 100 100">
                     <circle cx="50" cy="50" r="45" fill="none" stroke="#1e1b4b" stroke-width="8" />
@@ -242,30 +219,28 @@ function renderCompatibility(result) {
                 </svg>
                 <div class="absolute inset-0 flex flex-col items-center justify-center">
                     <span class="text-4xl font-bold text-white">${result.percentage}%</span>
-                    <span class="text-xs text-violet-300 uppercase tracking-widest">Affinité</span>
                 </div>
             </div>
-            <p class="text-center text-violet-100 italic max-w-xs">"${result.description}"</p>
+            <p class="text-center text-violet-100 italic">"${result.description}"</p>
         </div>
     `;
 }
 
 // --- Passport Logic ---
 function setupPassport() {
-    photoInput.addEventListener('change', (e) => {
-        const file = e.target.files[0];
-        if (!file) return;
-
-        const reader = new FileReader();
-        reader.onload = (ev) => {
-            userPhoto = ev.target.result;
-            // Mise à jour de l'aperçu dans le formulaire
-            photoPreview.innerHTML = `<img src="${userPhoto}" style="width:100%;height:100%;object-fit:cover;border-radius:0.5rem">`;
-            // ✅ CRITIQUE : On met à jour le passeport pour que l'image apparaisse dessus !
-            updatePassportPreview();
-        };
-        reader.readAsDataURL(file);
-    });
+    if (photoInput) {
+        photoInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (ev) => {
+                userPhoto = ev.target.result;
+                if (photoPreview) photoPreview.innerHTML = `<img src="${userPhoto}" style="width:100%;height:100%;object-fit:cover;border-radius:0.5rem">`;
+                updatePassportPreview();
+            };
+            reader.readAsDataURL(file);
+        });
+    }
 
     genderButtons.forEach(btn => {
         btn.addEventListener('click', () => {
@@ -276,136 +251,96 @@ function setupPassport() {
         });
     });
 
-    [document.getElementById('pass-firstname'), document.getElementById('pass-lastname'), passSignSelect].forEach(el => {
-        el.addEventListener('input', updatePassportPreview);
-        el.addEventListener('change', updatePassportPreview);
+    const inputs = ['pass-firstname', 'pass-lastname'];
+    inputs.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.addEventListener('input', updatePassportPreview);
     });
+    if (passSignSelect) passSignSelect.addEventListener('change', updatePassportPreview);
 
-    downloadBtn.addEventListener('click', async () => {
-        const node = document.getElementById('passport-card');
-        if (!node) {
-            alert("Carte introuvable");
-            return;
-        }
+    if (downloadBtn) {
+        downloadBtn.addEventListener('click', async () => {
+            const node = document.getElementById('passport-card');
+            if (!node) return;
 
-        downloadBtn.innerText = "Génération...";
-        downloadBtn.disabled = true;
+            downloadBtn.innerText = "Génération...";
+            downloadBtn.disabled = true;
 
-        try {
-            // Laisser un court délai pour être sûr que le DOM est prêt
-            await new Promise(r => setTimeout(r, 400));
+            try {
+                // Important pour laisser le temps au DOM de se stabiliser
+                await new Promise(r => setTimeout(r, 500));
+                
+                const dataUrl = await htmlToImage.toPng(node, {
+                    cacheBust: true,
+                    pixelRatio: 2,
+                    backgroundColor: null,
+                    skipAutoScale: true
+                });
 
-            // Utilisation directe de htmlToImage
-            const dataUrl = await htmlToImage.toPng(node, {
-                cacheBust: true,
-                pixelRatio: 2,
-                backgroundColor: null
-            });
-
-            const link = document.createElement('a');
-            const name = document.getElementById('pass-firstname').value || 'Astral';
-            link.download = `Passport_${name}.png`;
-            link.href = dataUrl;
-            link.click();
-
-        } catch (err) {
-            console.error("Erreur export:", err);
-            alert("Erreur lors de la création de l'image.");
-        } finally {
-            downloadBtn.innerHTML = `<i data-lucide="download"></i> Télécharger`;
-            downloadBtn.disabled = false;
-            lucide.createIcons();
-        }
-    });
-
+                const link = document.createElement('a');
+                link.download = `Passport_Astral.png`;
+                link.href = dataUrl;
+                link.click();
+            } catch (err) {
+                console.error("Erreur export image:", err);
+            } finally {
+                downloadBtn.innerHTML = `<i data-lucide="download"></i> Télécharger`;
+                downloadBtn.disabled = false;
+                lucide.createIcons();
+            }
+        });
+    }
     updatePassportPreview();
 }
 
 function updatePassportPreview() {
-    const fname = document.getElementById('pass-firstname').value || 'NON DÉFINI';
-    const lname = document.getElementById('pass-lastname').value || 'NON DÉFINI';
-    const signId = passSignSelect.value;
+    const fname = document.getElementById('pass-firstname')?.value || 'NON DÉFINI';
+    const lname = document.getElementById('pass-lastname')?.value || 'NON DÉFINI';
+    const signId = passSignSelect?.value;
     const sign = ZODIAC_SIGNS.find(s => s.id === signId) || ZODIAC_SIGNS[0];
     const genderChar = currentGender === 'Homme' ? 'M' : currentGender === 'Femme' ? 'F' : 'X';
-
     const container = document.getElementById('passport-capture-area');
+    
     if (!container) return;
 
     container.innerHTML = `
-        <div class="passport-container relative shadow-2xl" id="passport-card" style="border: 2px solid #d4af37; background: var(--passport-gradient);">
-            <div class="absolute top-[-50px] right-[-50px] w-40 h-40 rounded-full border border-[#d4af37]/10 pointer-events-none"></div>
-            <div class="absolute bottom-[20%] left-[-30px] w-24 h-24 rounded-full border border-[#d4af37]/5 pointer-events-none"></div>
-
-            <div class="flex justify-between items-start mb-4 z-10">
+        <div class="passport-container relative shadow-2xl" id="passport-card" style="border: 2px solid #d4af37; background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%);">
+            <div class="flex justify-between items-start mb-4">
                 <div class="flex flex-col">
-                    <span class="text-[9px] uppercase tracking-[0.4em] font-bold mb-1 opacity-70">Cosmic Identification</span>
+                    <span class="text-[9px] uppercase tracking-widest opacity-70">Cosmic Identification</span>
                     <h2 class="text-xl font-black tracking-widest text-white">PASSPORT</h2>
                 </div>
-                <div class="flex flex-col items-end">
-                    <div class="text-3xl filter drop-shadow-md" style="color: #d4af37">${sign.symbol}</div>
-                    <span class="text-[8px] font-mono opacity-50">ST-2026-${sign.id.toUpperCase().substring(0,3)}</span>
-                </div>
+                <div class="text-3xl" style="color: #d4af37">${sign.symbol}</div>
             </div>
-
-            <div class="flex gap-4 mb-4 z-10">
-                <div class="passport-photo-box shadow-inner" style="border: 1px solid #d4af37; background: rgba(0,0,0,0.2); overflow:hidden; width:80px; height:100px;">
-                    ${userPhoto ? `<img src="${userPhoto}" class="w-full h-full object-cover">` : `<div class="flex flex-col items-center justify-center h-full opacity-40"><i data-lucide="stars" class="w-8 h-8 mb-2"></i><span class="text-[10px]">Photo</span></div>`}
+            <div class="flex gap-4 mb-4">
+                <div class="passport-photo-box" style="border: 1px solid #d4af37; background: rgba(0,0,0,0.3); width:80px; height:100px; overflow:hidden;">
+                    ${userPhoto ? `<img src="${userPhoto}" class="w-full h-full object-cover">` : `<div class="flex items-center justify-center h-full opacity-20"><i data-lucide="stars"></i></div>`}
                 </div>
-                <div class="flex-1 flex flex-col justify-between py-1">
-                    <div class="border-b border-[#d4af37]/20 pb-1">
-                        <p class="passport-label" style="font-size:8px; color:#d4af37; text-transform:uppercase">Nom / Surname</p>
-                        <p class="passport-value text-white font-bold">${lname.toUpperCase()}</p>
+                <div class="flex-1 flex flex-col justify-around">
+                    <div>
+                        <p class="text-[7px] text-[#d4af37] uppercase">Nom / Surname</p>
+                        <p class="text-white font-bold text-sm">${lname.toUpperCase()}</p>
                     </div>
-                    <div class="border-b border-[#d4af37]/20 pb-1">
-                        <p class="passport-label" style="font-size:8px; color:#d4af37; text-transform:uppercase">Prénom / Given Name</p>
-                        <p class="passport-value text-white font-bold">${fname.toUpperCase()}</p>
+                    <div>
+                        <p class="text-[7px] text-[#d4af37] uppercase">Prénom / Given Name</p>
+                        <p class="text-white font-bold text-sm">${fname.toUpperCase()}</p>
                     </div>
                     <div class="flex gap-4">
-                        <div class="flex-1">
-                            <p class="passport-label" style="font-size:8px; color:#d4af37; text-transform:uppercase">Sexe / Sex</p>
-                            <p class="passport-value text-white font-bold">${genderChar}</p>
-                        </div>
-                        <div class="flex-1">
-                            <p class="passport-label" style="font-size:8px; color:#d4af37; text-transform:uppercase">Signe / Sign</p>
-                            <p class="passport-value text-white font-bold">${sign.name}</p>
-                        </div>
+                        <div><p class="text-[7px] text-[#d4af37]">Sexe</p><p class="text-white font-bold">${genderChar}</p></div>
+                        <div><p class="text-[7px] text-[#d4af37]">Signe</p><p class="text-white font-bold">${sign.name}</p></div>
                     </div>
                 </div>
             </div>
-
-            <div class="flex-1 pt-4 z-10 flex flex-col gap-3">
-                <div class="grid grid-cols-2 gap-4">
-                    <div class="bg-black/20 p-2 rounded border border-white/5">
-                        <p class="passport-label" style="font-size:7px; color:#d4af37">Élément</p>
-                        <p class="passport-value text-white text-[10px]">${sign.element}</p>
-                    </div>
-                    <div class="bg-black/20 p-2 rounded border border-white/5">
-                        <p class="passport-label" style="font-size:7px; color:#d4af37">Planète</p>
-                        <p class="passport-value text-white text-[10px]">${sign.rulingPlanet}</p>
-                    </div>
-                </div>
-                <div class="p-2 rounded-lg italic relative overflow-hidden" style="background: rgba(30, 27, 75, 0.4); border: 1px solid rgba(212, 175, 55, 0.2)">
-                     <div class="absolute top-0 left-0 w-1 h-full bg-[#d4af37]"></div>
-                    <p class="text-[9px] text-center leading-relaxed text-gray-200">"${sign.quote}"</p>
-                </div>
+            <div class="grid grid-cols-2 gap-4 mt-4">
+                <div class="bg-black/20 p-2 rounded"><p class="text-[7px] text-[#d4af37]">Élément</p><p class="text-white text-[10px]">${sign.element}</p></div>
+                <div class="bg-black/20 p-2 rounded"><p class="text-[7px] text-[#d4af37]">Planète</p><p class="text-white text-[10px]">${sign.rulingPlanet}</p></div>
             </div>
-
-            <div class="mt-auto pt-3 z-10">
-                <div class="flex justify-between items-end bg-[#d4af37]/5 p-2 rounded">
-                    <p class="passport-mrz font-mono tracking-tighter opacity-60 text-[7px] leading-tight text-white">
-                        P<FRA${lname.padEnd(5, '<').substring(0,5)}${fname.padEnd(5, '<').substring(0,5)}<<<<<<<<<<<<<<<<<<<<< <br>
-                        ${sign.name.toUpperCase()}<<${(Math.random()*1000000).toFixed(0)}<<<<<<<<<<<<<<<<<
-                    </p>
-                    <div class="flex flex-col items-end opacity-40">
-                         <i data-lucide="fingerprint" class="w-5 h-5 text-[#d4af37]"></i>
-                         <p class="text-[5px] text-white">Astro-Verified</p>
-                    </div>
-                </div>
+            <div class="mt-auto pt-4 font-mono text-[7px] opacity-50 text-white">
+                P<FRA${lname.substring(0,5)}<<<<<<<<<<<<<<<<<<<<<<br>${sign.name.toUpperCase()}<<<<<<<<<<<<<<<<
             </div>
         </div>
     `;
     lucide.createIcons();
 }
 
-// Run init
 document.addEventListener('DOMContentLoaded', init);
