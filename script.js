@@ -310,7 +310,13 @@ function setupPassport() {
 }
 
 function updatePassportPreview() {
-    const traitsHTML = sign.traits.slice(0, 4).map(t => `
+    const fname = document.getElementById('pass-firstname').value || 'NON DÉFINI';
+    const lname = document.getElementById('pass-lastname').value || 'NON DÉFINI';
+    const signId = passSignSelect.value;
+    const sign = ZODIAC_SIGNS.find(s => s.id === signId) || ZODIAC_SIGNS[0];
+    const genderChar = currentGender === 'Homme' ? 'M' : currentGender === 'Femme' ? 'F' : 'X';
+
+     const traitsHTML = sign.traits.slice(0, 4).map(t => `
     <span style="
         padding:4px 10px;
         border-radius:20px;
@@ -322,11 +328,6 @@ function updatePassportPreview() {
         ${t}
     </span>
 `).join('');
-    const fname = document.getElementById('pass-firstname').value || 'NON DÉFINI';
-    const lname = document.getElementById('pass-lastname').value || 'NON DÉFINI';
-    const signId = passSignSelect.value;
-    const sign = ZODIAC_SIGNS.find(s => s.id === signId) || ZODIAC_SIGNS[0];
-    const genderChar = currentGender === 'Homme' ? 'M' : currentGender === 'Femme' ? 'F' : 'X';
 
     const container = document.getElementById('passport-capture-area');
     container.innerHTML = `
