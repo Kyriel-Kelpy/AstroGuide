@@ -40,10 +40,15 @@ function init() {
     lucide.createIcons();
 }
 
+function updateIcon(el, name) {
+    if (!el) return;
+    el.innerHTML = `<i data-lucide="${name}"></i>`;
+    lucide.createIcons();
+}
+
 // --- Theme Logic ---
 function setupTheme() {
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    currentTheme = prefersDark ? 'dark' : 'light';
+    currentTheme = 'dark';
     applyTheme();
 
     themeToggle.addEventListener('click', () => {
@@ -54,43 +59,25 @@ function setupTheme() {
 
 function applyTheme() {
     body.setAttribute('data-theme', currentTheme);
-    
-    // CHANGEMENT ICI : On alterne l'icône selon le thème
-    // Si on est en dark, on montre le soleil (pour passer au clair)
-    // Si on est en light, on montre la lune (pour passer au sombre)
-    themeIcon.setAttribute('data-lucide', currentTheme === 'dark' ? 'sun' : 'moon');
-    
-    // On redessine l'icône
-    lucide.createIcons(); 
-    
-    // Update glows
-    const glow1 = document.getElementById('glow-1');
-    const glow2 = document.getElementById('glow-2');
-    if (currentTheme === 'dark') {
-        glow1.style.backgroundColor = '#4c1d95';
-        glow2.style.backgroundColor = '#1e3a8a';
-    } else {
-        glow1.style.backgroundColor = '#bae6fd';
-        glow2.style.backgroundColor = '#ddd6fe';
-    }
+
+    // ✅ FIX ICON
+    updateIcon(themeIcon, currentTheme === 'dark' ? 'sun' : 'moon');
 }
 
 // --- Audio Logic ---
 function setupAudio() {
-    audio.volume = 0.3;
+    audio.volume = 0.9;
+
     muteToggle.addEventListener('click', () => {
         isMuted = !isMuted;
+
         if (isMuted) {
             audio.pause();
-            // CHANGEMENT ICI : Icône muet
-            muteIcon.setAttribute('data-lucide', 'volume-x');
+            updateIcon(muteIcon, 'volume-x');
         } else {
-            audio.play().catch(err => console.log("Audio blocked:", err));
-            // CHANGEMENT ICI : Icône volume actif
-            muteIcon.setAttribute('data-lucide', 'volume-2');
+            audio.play().catch(() => {});
+            updateIcon(muteIcon, 'volume-2');
         }
-        // TRÈS IMPORTANT : On redemande à Lucide de transformer l'icône
-        lucide.createIcons();
     });
 }
 
@@ -285,23 +272,22 @@ function renderCompatibility(result) {
 
 // --- Passport Logic ---
 function setupPassport() {
+    // IMAGE UPLOAD FIX
+    const photoInput = document.getElementById('photo-input');
+    const photoPreview = document.getElementById('photo-preview');
+
     photoInput.addEventListener('change', (e) => {
-    const file = e.target.files[0];
-    if (file) {
+        const file = e.target.files[0];
+        if (!file) return;
+
         const reader = new FileReader();
-        reader.onload = (e) => {
-            // Créer une image pour vérifier qu'elle est bien chargée avant de l'assigner
-            const img = new Image();
-            img.onload = () => {
-                userPhoto = e.target.result; // C'est du Base64, donc c'est sûr pour l'export
-                photoPreview.innerHTML = `<img src="${userPhoto}" class="w-full h-full object-cover">`;
-                updatePassportPreview();
-            };
-            img.src = e.target.result;
+        reader.onload = (ev) => {
+            userPhoto = ev.target.result;
+            photoPreview.innerHTML = `<img src="${userPhoto}" style="width:100%;height:100%;object-fit:cover">`;
         };
         reader.readAsDataURL(file);
-    }
-});
+    });
+
     genderButtons.forEach(btn => {
         btn.addEventListener('click', () => {
             genderButtons.forEach(b => b.classList.remove('active-gender'));
@@ -318,39 +304,40 @@ function setupPassport() {
 
 
 downloadBtn.addEventListener('click', async () => {
-    const area = document.getElementById('passport-card'); // On cible l'élément interne directement
-    if (!area) return;
+    const node = document.getElementById('passport-card');
+        if (!node) {
+            alert("Carte introuvable");
+            return;
+        }
 
-    // Feedback visuel (optionnel)
-    downloadBtn.innerText = "Génération...";
-    downloadBtn.disabled = true;
+        downloadBtn.innerText = "Génération...";
+        downloadBtn.disabled = true;
 
-    try {
-        // Options pour garantir la qualité et le support des styles
-        const options = { 
-            pixelRatio: 2, 
-            cacheBust: true,
-            style: {
-                borderRadius: '1rem', // Force l'arrondi sur l'image finale
-            }
-        };
+        try {
+            // 🔥 ATTENTE RENDER
+            await new Promise(r => setTimeout(r, 300));
 
-        const dataUrl = await htmlToImage.toPng(area, options);
-        
-        const link = document.createElement('a');
-        const name = document.getElementById('pass-firstname').value || 'Astral';
-        link.download = `Passeport_Astral_${name}.png`;
-        link.href = dataUrl;
-        link.click();
-    } catch (err) {
-        console.error('Erreur lors de l\'export:', err);
-        alert("Erreur lors de la création de l'image. Essayez un autre navigateur.");
-    } finally {
-        downloadBtn.innerHTML = `<i data-lucide="download" class="w-5 h-5"></i> Télécharger mon Passeport`;
+            // 🔥 FORCE STYLES
+            const dataUrl = await htmlToImage.toPng(node, {
+                cacheBust: true,
+                pixelRatio: 3,
+                backgroundColor: null
+            });
+
+            const link = document.createElement('a');
+            link.download = "passport.png";
+            link.href = dataUrl;
+            link.click();
+
+        } catch (err) {
+            console.error(err);
+            alert("Erreur export image");
+        }
+
+        downloadBtn.innerHTML = `<i data-lucide="download"></i> Télécharger`;
         downloadBtn.disabled = false;
         lucide.createIcons();
-    }
-});
+    });
 
     updatePassportPreview();
 }
