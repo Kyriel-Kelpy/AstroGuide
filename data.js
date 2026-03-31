@@ -97,7 +97,7 @@ export const ZODIAC_SIGNS = [
     rulingPlanet: 'Mercure',
     startMonth: 8,
     startDay: 23,
-    endMonth: 8,
+    endMonth: 9,
     endDay: 22,
     description: 'La Vierge est méticuleuse, analytique et dévouée au service des autres. Elle recherche la perfection et l\'ordre dans tout ce qu\'elle entreprend, avec un esprit pratique.',
     history: 'Souvent associée à Astrée, la déesse de la justice, elle symbolise la pureté, le discernement et le lien entre le ciel et la terre par le travail soigné.',
