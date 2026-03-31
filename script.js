@@ -54,8 +54,14 @@ function setupTheme() {
 
 function applyTheme() {
     body.setAttribute('data-theme', currentTheme);
+    
+    // CHANGEMENT ICI : On alterne l'icône selon le thème
+    // Si on est en dark, on montre le soleil (pour passer au clair)
+    // Si on est en light, on montre la lune (pour passer au sombre)
     themeIcon.setAttribute('data-lucide', currentTheme === 'dark' ? 'sun' : 'moon');
-    lucide.createIcons();
+    
+    // On redessine l'icône
+    lucide.createIcons(); 
     
     // Update glows
     const glow1 = document.getElementById('glow-1');
@@ -76,11 +82,14 @@ function setupAudio() {
         isMuted = !isMuted;
         if (isMuted) {
             audio.pause();
+            // CHANGEMENT ICI : Icône muet
             muteIcon.setAttribute('data-lucide', 'volume-x');
         } else {
             audio.play().catch(err => console.log("Audio blocked:", err));
+            // CHANGEMENT ICI : Icône volume actif
             muteIcon.setAttribute('data-lucide', 'volume-2');
         }
+        // TRÈS IMPORTANT : On redemande à Lucide de transformer l'icône
         lucide.createIcons();
     });
 }
