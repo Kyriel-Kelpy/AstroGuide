@@ -59,14 +59,12 @@ function setupTheme() {
 
 function applyTheme() {
     body.setAttribute('data-theme', currentTheme);
-
-    // ✅ FIX ICON
     updateIcon(themeIcon, currentTheme === 'dark' ? 'sun' : 'moon');
 }
 
 // --- Audio Logic ---
 function setupAudio() {
-    audio.volume = 0.9;
+    audio.volume = 0.3;
 
     muteToggle.addEventListener('click', () => {
         isMuted = !isMuted;
@@ -101,7 +99,6 @@ function showSection(sectionId) {
     if (targetSection) targetSection.classList.add('active');
     if (targetBtn) targetBtn.classList.add('active');
     
-    // Reset result if going back to home
     if (sectionId === 'home') {
         document.getElementById('zodiac-card-container').innerHTML = '';
     }
@@ -137,7 +134,6 @@ function populateSelects() {
         passSignSelect.add(new Option(`${sign.symbol} ${sign.name}`, sign.id));
     });
     
-    // Default values
     compSign1Select.value = ZODIAC_SIGNS[0].id;
     compSign2Select.value = ZODIAC_SIGNS[1].id;
 }
@@ -220,6 +216,7 @@ function renderZodiacCard(sign) {
 
 function renderExplorer() {
     const grid = document.getElementById('explorer-grid');
+    if (!grid) return;
     ZODIAC_SIGNS.forEach(sign => {
         const btn = document.createElement('button');
         btn.className = "glass-card p-6 flex flex-col items-center gap-3 transition-all hover:scale-105 active:scale-95";
@@ -272,10 +269,6 @@ function renderCompatibility(result) {
 
 // --- Passport Logic ---
 function setupPassport() {
-    // IMAGE UPLOAD FIX
-    const photoInput = document.getElementById('photo-input');
-    const photoPreview = document.getElementById('photo-preview');
-
     photoInput.addEventListener('change', (e) => {
         const file = e.target.files[0];
         if (!file) return;
@@ -283,7 +276,10 @@ function setupPassport() {
         const reader = new FileReader();
         reader.onload = (ev) => {
             userPhoto = ev.target.result;
-            photoPreview.innerHTML = `<img src="${userPhoto}" style="width:100%;height:100%;object-fit:cover">`;
+            // Mise à jour de l'aperçu dans le formulaire
+            photoPreview.innerHTML = `<img src="${userPhoto}" style="width:100%;height:100%;object-fit:cover;border-radius:0.5rem">`;
+            // ✅ CRITIQUE : On met à jour le passeport pour que l'image apparaisse dessus !
+            updatePassportPreview();
         };
         reader.readAsDataURL(file);
     });
@@ -302,9 +298,8 @@ function setupPassport() {
         el.addEventListener('change', updatePassportPreview);
     });
 
-
-downloadBtn.addEventListener('click', async () => {
-    const node = document.getElementById('passport-card');
+    downloadBtn.addEventListener('click', async () => {
+        const node = document.getElementById('passport-card');
         if (!node) {
             alert("Carte introuvable");
             return;
@@ -314,29 +309,30 @@ downloadBtn.addEventListener('click', async () => {
         downloadBtn.disabled = true;
 
         try {
-            // 🔥 ATTENTE RENDER
-            await new Promise(r => setTimeout(r, 300));
+            // Laisser un court délai pour être sûr que le DOM est prêt
+            await new Promise(r => setTimeout(r, 400));
 
-            // 🔥 FORCE STYLES
+            // Utilisation directe de htmlToImage
             const dataUrl = await htmlToImage.toPng(node, {
                 cacheBust: true,
-                pixelRatio: 3,
+                pixelRatio: 2,
                 backgroundColor: null
             });
 
             const link = document.createElement('a');
-            link.download = "passport.png";
+            const name = document.getElementById('pass-firstname').value || 'Astral';
+            link.download = `Passport_${name}.png`;
             link.href = dataUrl;
             link.click();
 
         } catch (err) {
-            console.error(err);
-            alert("Erreur export image");
+            console.error("Erreur export:", err);
+            alert("Erreur lors de la création de l'image.");
+        } finally {
+            downloadBtn.innerHTML = `<i data-lucide="download"></i> Télécharger`;
+            downloadBtn.disabled = false;
+            lucide.createIcons();
         }
-
-        downloadBtn.innerHTML = `<i data-lucide="download"></i> Télécharger`;
-        downloadBtn.disabled = false;
-        lucide.createIcons();
     });
 
     updatePassportPreview();
@@ -350,6 +346,8 @@ function updatePassportPreview() {
     const genderChar = currentGender === 'Homme' ? 'M' : currentGender === 'Femme' ? 'F' : 'X';
 
     const container = document.getElementById('passport-capture-area');
+    if (!container) return;
+
     container.innerHTML = `
         <div class="passport-container relative shadow-2xl" id="passport-card" style="border: 2px solid #d4af37; background: var(--passport-gradient);">
             <div class="absolute top-[-50px] right-[-50px] w-40 h-40 rounded-full border border-[#d4af37]/10 pointer-events-none"></div>
@@ -367,26 +365,26 @@ function updatePassportPreview() {
             </div>
 
             <div class="flex gap-4 mb-4 z-10">
-                <div class="passport-photo-box shadow-inner" style="border: 1px solid #d4af37">
-                    ${userPhoto ? `<img src="${userPhoto}" class="w-full h-full object-cover">` : `<div class="flex flex-col items-center opacity-40"><i data-lucide="stars" class="w-8 h-8 mb-2"></i><span class="text-[10px]">Photo</span></div>`}
+                <div class="passport-photo-box shadow-inner" style="border: 1px solid #d4af37; background: rgba(0,0,0,0.2); overflow:hidden; width:80px; height:100px;">
+                    ${userPhoto ? `<img src="${userPhoto}" class="w-full h-full object-cover">` : `<div class="flex flex-col items-center justify-center h-full opacity-40"><i data-lucide="stars" class="w-8 h-8 mb-2"></i><span class="text-[10px]">Photo</span></div>`}
                 </div>
                 <div class="flex-1 flex flex-col justify-between py-1">
                     <div class="border-b border-[#d4af37]/20 pb-1">
-                        <p class="passport-label">Nom / Surname</p>
-                        <p class="passport-value text-white">${lname.toUpperCase()}</p>
+                        <p class="passport-label" style="font-size:8px; color:#d4af37; text-transform:uppercase">Nom / Surname</p>
+                        <p class="passport-value text-white font-bold">${lname.toUpperCase()}</p>
                     </div>
                     <div class="border-b border-[#d4af37]/20 pb-1">
-                        <p class="passport-label">Prénom / Given Name</p>
-                        <p class="passport-value text-white">${fname.toUpperCase()}</p>
+                        <p class="passport-label" style="font-size:8px; color:#d4af37; text-transform:uppercase">Prénom / Given Name</p>
+                        <p class="passport-value text-white font-bold">${fname.toUpperCase()}</p>
                     </div>
                     <div class="flex gap-4">
                         <div class="flex-1">
-                            <p class="passport-label">Sexe / Sex</p>
-                            <p class="passport-value text-white" style="font-size: 11px">${genderChar}</p>
+                            <p class="passport-label" style="font-size:8px; color:#d4af37; text-transform:uppercase">Sexe / Sex</p>
+                            <p class="passport-value text-white font-bold">${genderChar}</p>
                         </div>
                         <div class="flex-1">
-                            <p class="passport-label">Signe / Sign</p>
-                            <p class="passport-value text-white" style="font-size: 11px">${sign.name}</p>
+                            <p class="passport-label" style="font-size:8px; color:#d4af37; text-transform:uppercase">Signe / Sign</p>
+                            <p class="passport-value text-white font-bold">${sign.name}</p>
                         </div>
                     </div>
                 </div>
@@ -395,35 +393,35 @@ function updatePassportPreview() {
             <div class="flex-1 pt-4 z-10 flex flex-col gap-3">
                 <div class="grid grid-cols-2 gap-4">
                     <div class="bg-black/20 p-2 rounded border border-white/5">
-                        <p class="passport-label">Élément</p>
-                        <p class="passport-value text-white" style="font-size: 11px">${sign.element}</p>
+                        <p class="passport-label" style="font-size:7px; color:#d4af37">Élément</p>
+                        <p class="passport-value text-white text-[10px]">${sign.element}</p>
                     </div>
                     <div class="bg-black/20 p-2 rounded border border-white/5">
-                        <p class="passport-label">Planète</p>
-                        <p class="passport-value text-white" style="font-size: 11px">${sign.rulingPlanet}</p>
+                        <p class="passport-label" style="font-size:7px; color:#d4af37">Planète</p>
+                        <p class="passport-value text-white text-[10px]">${sign.rulingPlanet}</p>
                     </div>
                 </div>
-                <div class="p-3 rounded-lg italic relative overflow-hidden" style="background: rgba(30, 27, 75, 0.4); border: 1px solid rgba(212, 175, 55, 0.2)">
+                <div class="p-2 rounded-lg italic relative overflow-hidden" style="background: rgba(30, 27, 75, 0.4); border: 1px solid rgba(212, 175, 55, 0.2)">
                      <div class="absolute top-0 left-0 w-1 h-full bg-[#d4af37]"></div>
-                    <p class="text-[10px] text-center leading-relaxed text-gray-200">"${sign.quote}"</p>
+                    <p class="text-[9px] text-center leading-relaxed text-gray-200">"${sign.quote}"</p>
                 </div>
             </div>
 
             <div class="mt-auto pt-3 z-10">
                 <div class="flex justify-between items-end bg-[#d4af37]/5 p-2 rounded">
-                    <p class="passport-mrz font-mono tracking-tighter opacity-60">
-                        P<FRA${lname.padEnd(5, '<')}${fname.padEnd(5, '<')}<<<<<<<<<<<<<<<<<<<<< <br>
+                    <p class="passport-mrz font-mono tracking-tighter opacity-60 text-[7px] leading-tight text-white">
+                        P<FRA${lname.padEnd(5, '<').substring(0,5)}${fname.padEnd(5, '<').substring(0,5)}<<<<<<<<<<<<<<<<<<<<< <br>
                         ${sign.name.toUpperCase()}<<${(Math.random()*1000000).toFixed(0)}<<<<<<<<<<<<<<<<<
                     </p>
                     <div class="flex flex-col items-end opacity-40">
-                         <i data-lucide="fingerprint" class="w-6 h-6 mb-1 text-[#d4af37]"></i>
-                         <p class="text-[6px]">Astro-Verified</p>
+                         <i data-lucide="fingerprint" class="w-5 h-5 text-[#d4af37]"></i>
+                         <p class="text-[5px] text-white">Astro-Verified</p>
                     </div>
                 </div>
             </div>
         </div>
     `;
-    lucide.createIcons(); // Important pour les icônes à l'intérieur du passeport
+    lucide.createIcons();
 }
 
 // Run init
