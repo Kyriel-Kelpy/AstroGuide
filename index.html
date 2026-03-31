@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AstroGuide - Votre Boussole Céleste</title>
     
-    <!-- CDNs -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html-to-image/1.11.11/html-to-image.min.js"></script>
@@ -13,7 +12,6 @@
     <script src="https://unpkg.com/html-to-image"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     
-    <!-- Custom Styles -->
     <link rel="stylesheet" href="./style.css">
     
     <style>
@@ -23,23 +21,20 @@
 </head>
 <body data-theme="dark">
 <audio id="bg-audio" loop src="./assets/musique-astrale.mp3"></audio>
-    <!-- Background Glows -->
     <div class="fixed inset-0 overflow-hidden pointer-events-none z-0">
         <div id="glow-1" class="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] blur-[120px] rounded-full opacity-20 bg-violet-900"></div>
         <div id="glow-2" class="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] blur-[120px] rounded-full opacity-20 bg-blue-900"></div>
     </div>
 
     <div class="relative z-10 min-h-screen flex flex-col">
-        <!-- Top Controls -->
         <div class="flex justify-between items-center px-4 md:px-8 py-4">
-            <div class="flex gap-2">
+            <div class="flex gap-2 ml-auto">
                 <button id="mute-toggle" class="p-3 rounded-full bg-opacity-20 bg-violet-800 text-violet-400 hover:scale-110 transition-all">
                     <i data-lucide="volume-x" id="mute-icon"></i>
                 </button>
             </div>
         </div>
 
-        <!-- Navigation -->
         <nav class="flex flex-wrap justify-center p-4 md:p-6 gap-4 md:gap-8">
             <button class="btn-nav active" data-section="home">
                 <i data-lucide="compass" class="w-4 h-4"></i> Mon Signe
@@ -55,7 +50,6 @@
             </button>
         </nav>
 
-        <!-- Main Content -->
         <main class="container mx-auto px-4 py-8 max-w-5xl flex-1">
             <header class="text-center mb-12">
                 <h1 id="main-title" class="text-5xl md:text-6xl font-extrabold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-violet-400 to-blue-400">
@@ -64,7 +58,6 @@
                 <p class="opacity-70 text-lg text-violet-200" id="main-subtitle">Explorez les mystères du zodiaque et les liens célestes.</p>
             </header>
 
-            <!-- Section: Home (Find Sign) -->
             <section id="section-home" class="section active fade-in">
                 <div class="max-w-md mx-auto glass-card p-8">
                     <div class="flex justify-center mb-6">
@@ -91,17 +84,14 @@
                 </div>
             </section>
 
-            <!-- Section: Result -->
             <section id="section-result" class="section fade-in">
                 <div id="zodiac-card-container"></div>
             </section>
 
-            <!-- Section: Explorer -->
             <section id="section-explorer" class="section fade-in">
                 <div id="explorer-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 md:gap-6"></div>
             </section>
 
-            <!-- Section: Compatibility -->
             <section id="section-compatibility" class="section fade-in">
                 <div class="max-w-2xl mx-auto glass-card p-8">
                     <h2 class="text-3xl font-bold text-center mb-8">Testeur de Compatibilité</h2>
@@ -120,7 +110,6 @@
                 </div>
             </section>
 
-            <!-- Section: Astral Card -->
             <section id="section-astral-card" class="section fade-in">
                 <div class="grid md:grid-cols-2 gap-12 items-start">
                     <div class="glass-card p-8 space-y-6">
@@ -165,8 +154,7 @@
 
                     <div class="flex flex-col items-center gap-6">
                         <div id="passport-capture-area">
-                            <!-- Passport content will be injected here -->
-                        </div>
+                            </div>
                         <button id="download-passport" class="btn-primary flex items-center justify-center gap-2 w-auto px-8">
                             <i data-lucide="download" class="w-5 h-5"></i> Télécharger mon Passeport
                         </button>
@@ -180,7 +168,6 @@
         </footer>
     </div>
 
-    <!-- Templates for dynamic injection -->
     <template id="tpl-zodiac-card">
         <div class="w-full max-w-2xl mx-auto glass-card overflow-hidden shadow-2xl border border-violet-500/30">
             <div class="relative p-8">
