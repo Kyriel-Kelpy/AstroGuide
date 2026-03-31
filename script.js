@@ -10,8 +10,6 @@ let currentGender = 'Homme';
 // --- Selectors ---
 const body = document.body;
 const audio = document.getElementById('bg-audio');
-const themeToggle = document.getElementById('theme-toggle');
-const themeIcon = document.getElementById('theme-icon');
 const muteToggle = document.getElementById('mute-toggle');
 const muteIcon = document.getElementById('mute-icon');
 const navButtons = document.querySelectorAll('.btn-nav');
@@ -30,7 +28,6 @@ const downloadBtn = document.getElementById('download-passport');
 
 // --- Initialization ---
 function init() {
-    setupTheme();
     setupAudio();
     populateSelects();
     setupNavigation();
@@ -40,34 +37,6 @@ function init() {
     lucide.createIcons();
 }
 
-// --- Theme Logic ---
-function setupTheme() {
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    currentTheme = prefersDark ? 'dark' : 'light';
-    applyTheme();
-
-    themeToggle.addEventListener('click', () => {
-        currentTheme = currentTheme === 'dark' ? 'light' : 'dark';
-        applyTheme();
-    });
-}
-
-function applyTheme() {
-    body.setAttribute('data-theme', currentTheme);
-    themeIcon.setAttribute('data-lucide', currentTheme === 'dark' ? 'sun' : 'moon');
-    lucide.createIcons();
-    
-    // Update glows
-    const glow1 = document.getElementById('glow-1');
-    const glow2 = document.getElementById('glow-2');
-    if (currentTheme === 'dark') {
-        glow1.style.backgroundColor = '#4c1d95';
-        glow2.style.backgroundColor = '#1e3a8a';
-    } else {
-        glow1.style.backgroundColor = '#bae6fd';
-        glow2.style.backgroundColor = '#ddd6fe';
-    }
-}
 
 // --- Audio Logic ---
 function setupAudio() {
