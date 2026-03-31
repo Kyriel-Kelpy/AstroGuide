@@ -1,8 +1,8 @@
 :root {
-  /* Dark Theme (Default) */
+  /* Dark Theme (Default) - Optimisation des contrastes secondaires */
   --bg-color: #0a0a1a;
   --text-color: #f3f4f6;
-  --subtext-color: #ddd6fe;
+  --subtext-color: #a78bfa; /* Un violet plus lisible que le précédent */
   --accent-color: #7c3aed;
   --card-bg: rgba(30, 27, 75, 0.4);
   --border-color: rgba(139, 92, 246, 0.2);
@@ -13,17 +13,17 @@
 }
 
 [data-theme="light"] {
-  /* Light Theme (Parchment/Parchemin) */
-  --bg-color: #f5f2ed;
-  --text-color: #1e293b;
-  --subtext-color: #475569;
-  --accent-color: #8b5cf6;
-  --card-bg: rgba(255, 255, 255, 0.8);
-  --border-color: rgba(139, 92, 246, 0.1);
+  /* Light Theme (Parchment) - Amélioration de la lisibilité */
+  --bg-color: #fcfaf7; /* Un parchemin légèrement plus lumineux */
+  --text-color: #0f172a; /* Bleu-noir très profond pour un contraste maximal */
+  --subtext-color: #334155; /* Gris ardoise plus soutenu pour les descriptions */
+  --accent-color: #6d28d9; /* Un violet un peu plus sombre pour le mode clair */
+  --card-bg: rgba(255, 255, 255, 0.9); /* Plus d'opacité pour détacher la carte du fond */
+  --border-color: rgba(109, 40, 217, 0.2);
   --input-bg: #ffffff;
-  --nav-inactive: rgba(139, 92, 246, 0.1);
-  --glow-color: rgba(139, 92, 246, 0.1);
-  --passport-gradient: linear-gradient(135deg, #ffffff 0%, #f5f2ed 50%, #e5e7eb 100%);
+  --nav-inactive: rgba(109, 40, 217, 0.08);
+  --glow-color: rgba(109, 40, 217, 0.1);
+  --passport-gradient: linear-gradient(135deg, #ffffff 0%, #fcfaf7 50%, #f1f5f9 100%);
 }
 
 body {
@@ -138,7 +138,7 @@ body {
   text-transform: uppercase;
   font-weight: bold;
   letter-spacing: 0.05em;
-  color: #a78bfa;
+  color: #7c3aed; /* On part sur le violet d'accent par défaut */
   margin-bottom: 2px;
 }
 
@@ -151,6 +151,20 @@ body {
 
 [data-theme="light"] .passport-value {
   color: #1e293b;
+}
+
+[data-theme="light"] .passport-label {
+  color: #6d28d9; /* Violet plus profond en mode clair */
+}
+
+[data-theme="light"] .passport-mrz {
+  color: #64748b; /* Gris plus lisible pour la zone machine en bas */
+}
+
+/* Ajustement de la photo box pour le mode clair */
+[data-theme="light"] .passport-photo-box {
+  background-color: #e2e8f0;
+  border: 1px solid rgba(109, 40, 217, 0.2);
 }
 
 .passport-mrz {
