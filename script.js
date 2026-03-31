@@ -10,8 +10,6 @@ let currentGender = 'Homme';
 // --- Selectors ---
 const body = document.body;
 const audio = document.getElementById('bg-audio');
-const themeToggle = document.getElementById('theme-toggle');
-const themeIcon = document.getElementById('theme-icon');
 const muteToggle = document.getElementById('mute-toggle');
 const muteIcon = document.getElementById('mute-icon');
 const navButtons = document.querySelectorAll('.btn-nav');
@@ -46,21 +44,7 @@ function updateIcon(el, name) {
     lucide.createIcons();
 }
 
-// --- Theme Logic ---
-function setupTheme() {
-    currentTheme = 'dark';
-    applyTheme();
 
-    themeToggle.addEventListener('click', () => {
-        currentTheme = currentTheme === 'dark' ? 'light' : 'dark';
-        applyTheme();
-    });
-}
-
-function applyTheme() {
-    body.setAttribute('data-theme', currentTheme);
-    updateIcon(themeIcon, currentTheme === 'dark' ? 'sun' : 'moon');
-}
 
 // --- Audio Logic ---
 function setupAudio() {
