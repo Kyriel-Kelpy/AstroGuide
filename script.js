@@ -303,18 +303,41 @@ function setupPassport() {
         el.addEventListener('change', updatePassportPreview);
     });
 
-    downloadBtn.addEventListener('click', async () => {
-        const area = document.getElementById('passport-capture-area');
-        try {
-            const dataUrl = await htmlToImage.toPng(area, { pixelRatio: 2, backgroundColor: '#0a0a1a' });
-            const link = document.createElement('a');
-            link.download = `AstroPassport_${document.getElementById('pass-firstname').value || 'User'}.png`;
-            link.href = dataUrl;
-            link.click();
-        } catch (err) {
-            console.error('Export error:', err);
-        }
-    });
+
+downloadBtn.addEventListener('click', async () => {
+    const area = document.getElementById('passport-card'); // On cible l'élément interne directement
+    if (!area) return;
+
+    // Feedback visuel (optionnel)
+    downloadBtn.innerText = "Génération...";
+    downloadBtn.disabled = true;
+
+    try {
+        // Options pour garantir la qualité et le support des styles
+        const options = { 
+            pixelRatio: 2, 
+            cacheBust: true,
+            style: {
+                borderRadius: '1rem', // Force l'arrondi sur l'image finale
+            }
+        };
+
+        const dataUrl = await htmlToImage.toPng(area, options);
+        
+        const link = document.createElement('a');
+        const name = document.getElementById('pass-firstname').value || 'Astral';
+        link.download = `Passeport_Astral_${name}.png`;
+        link.href = dataUrl;
+        link.click();
+    } catch (err) {
+        console.error('Erreur lors de l\'export:', err);
+        alert("Erreur lors de la création de l'image. Essayez un autre navigateur.");
+    } finally {
+        downloadBtn.innerHTML = `<i data-lucide="download" class="w-5 h-5"></i> Télécharger mon Passeport`;
+        downloadBtn.disabled = false;
+        lucide.createIcons();
+    }
+});
 
     updatePassportPreview();
 }
@@ -328,69 +351,79 @@ function updatePassportPreview() {
 
     const container = document.getElementById('passport-capture-area');
     container.innerHTML = `
-        <div class="passport-container" id="passport-card">
-            <div class="flex justify-between items-start mb-6 z-10">
+        <div class="passport-container relative shadow-2xl" id="passport-card" style="border: 2px solid #d4af37; background: var(--passport-gradient);">
+            <div class="absolute top-[-50px] right-[-50px] w-40 h-40 rounded-full border border-[#d4af37]/10 pointer-events-none"></div>
+            <div class="absolute bottom-[20%] left-[-30px] w-24 h-24 rounded-full border border-[#d4af37]/5 pointer-events-none"></div>
+
+            <div class="flex justify-between items-start mb-4 z-10">
                 <div class="flex flex-col">
-                    <span class="text-[10px] uppercase tracking-[0.3em] font-bold mb-1" style="color: #a78bfa">Union Astrologique</span>
-                    <h2 class="text-xl font-bold tracking-tight" style="color: #ffffff">PASSEPORT ASTRAL</h2>
+                    <span class="text-[9px] uppercase tracking-[0.4em] font-bold mb-1 opacity-70">Cosmic Identification</span>
+                    <h2 class="text-xl font-black tracking-widest text-white">PASSPORT</h2>
                 </div>
-                <div class="text-3xl" style="color: #d4af37">${sign.symbol}</div>
+                <div class="flex flex-col items-end">
+                    <div class="text-3xl filter drop-shadow-md" style="color: #d4af37">${sign.symbol}</div>
+                    <span class="text-[8px] font-mono opacity-50">ST-2026-${sign.id.toUpperCase().substring(0,3)}</span>
+                </div>
             </div>
 
-            <div class="flex gap-4 mb-6 z-10">
-                <div class="passport-photo-box">
-                    ${userPhoto ? `<img src="${userPhoto}" class="w-full h-full object-cover">` : `<span class="text-4xl" style="color: #d4af37">${sign.symbol}</span>`}
+            <div class="flex gap-4 mb-4 z-10">
+                <div class="passport-photo-box shadow-inner" style="border: 1px solid #d4af37">
+                    ${userPhoto ? `<img src="${userPhoto}" class="w-full h-full object-cover">` : `<div class="flex flex-col items-center opacity-40"><i data-lucide="stars" class="w-8 h-8 mb-2"></i><span class="text-[10px]">Photo</span></div>`}
                 </div>
                 <div class="flex-1 flex flex-col justify-between py-1">
-                    <div>
+                    <div class="border-b border-[#d4af37]/20 pb-1">
                         <p class="passport-label">Nom / Surname</p>
-                        <p class="passport-value">${lname.toUpperCase()}</p>
+                        <p class="passport-value text-white">${lname.toUpperCase()}</p>
                     </div>
-                    <div>
+                    <div class="border-b border-[#d4af37]/20 pb-1">
                         <p class="passport-label">Prénom / Given Name</p>
-                        <p class="passport-value">${fname.toUpperCase()}</p>
+                        <p class="passport-value text-white">${fname.toUpperCase()}</p>
                     </div>
                     <div class="flex gap-4">
-                        <div>
+                        <div class="flex-1">
                             <p class="passport-label">Sexe / Sex</p>
-                            <p class="passport-value" style="font-size: 12px">${genderChar}</p>
+                            <p class="passport-value text-white" style="font-size: 11px">${genderChar}</p>
                         </div>
-                        <div>
+                        <div class="flex-1">
                             <p class="passport-label">Signe / Sign</p>
-                            <p class="passport-value" style="font-size: 12px">${sign.name}</p>
+                            <p class="passport-value text-white" style="font-size: 11px">${sign.name}</p>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div class="flex-1 pt-5 z-10 flex flex-col gap-4" style="border-top: 1px solid rgba(212, 175, 55, 0.2)">
+            <div class="flex-1 pt-4 z-10 flex flex-col gap-3">
                 <div class="grid grid-cols-2 gap-4">
-                    <div>
+                    <div class="bg-black/20 p-2 rounded border border-white/5">
                         <p class="passport-label">Élément</p>
-                        <p class="passport-value" style="font-size: 12px">${sign.element}</p>
+                        <p class="passport-value text-white" style="font-size: 11px">${sign.element}</p>
                     </div>
-                    <div>
+                    <div class="bg-black/20 p-2 rounded border border-white/5">
                         <p class="passport-label">Planète</p>
-                        <p class="passport-value" style="font-size: 12px">${sign.rulingPlanet}</p>
+                        <p class="passport-value text-white" style="font-size: 11px">${sign.rulingPlanet}</p>
                     </div>
                 </div>
-                <div class="p-3 rounded-lg italic" style="background: rgba(30, 27, 75, 0.4); border: 1px solid rgba(212, 175, 55, 0.1)">
-                    <p class="text-[11px] text-center leading-relaxed" style="color: #e2e8f0">"${sign.quote}"</p>
+                <div class="p-3 rounded-lg italic relative overflow-hidden" style="background: rgba(30, 27, 75, 0.4); border: 1px solid rgba(212, 175, 55, 0.2)">
+                     <div class="absolute top-0 left-0 w-1 h-full bg-[#d4af37]"></div>
+                    <p class="text-[10px] text-center leading-relaxed text-gray-200">"${sign.quote}"</p>
                 </div>
             </div>
 
-            <div class="mt-auto pt-4 z-10 flex flex-col gap-2" style="border-top: 1px solid rgba(212, 175, 55, 0.2)">
-                <div class="flex justify-between items-end">
-                    <p class="passport-mrz">
-                        P<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< <br>
-                        ${lname.padEnd(10, '<').toUpperCase()}${fname.padEnd(10, '<').toUpperCase()}<<<<<<<<<<<<<<<<<<<< <br>
-                        ${sign.name.toUpperCase()}<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+            <div class="mt-auto pt-3 z-10">
+                <div class="flex justify-between items-end bg-[#d4af37]/5 p-2 rounded">
+                    <p class="passport-mrz font-mono tracking-tighter opacity-60">
+                        P<FRA${lname.padEnd(5, '<')}${fname.padEnd(5, '<')}<<<<<<<<<<<<<<<<<<<<< <br>
+                        ${sign.name.toUpperCase()}<<${(Math.random()*1000000).toFixed(0)}<<<<<<<<<<<<<<<<<
                     </p>
-                    <p class="text-[8px] italic" style="color: rgba(167, 139, 250, 0.4)">AstroGuide App</p>
+                    <div class="flex flex-col items-end opacity-40">
+                         <i data-lucide="fingerprint" class="w-6 h-6 mb-1 text-[#d4af37]"></i>
+                         <p class="text-[6px]">Astro-Verified</p>
+                    </div>
                 </div>
             </div>
         </div>
     `;
+    lucide.createIcons(); // Important pour les icônes à l'intérieur du passeport
 }
 
 // Run init
