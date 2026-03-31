@@ -273,22 +273,55 @@ function setupPassport() {
     });
 
     downloadBtn.addEventListener('click', async () => {
-        const area = document.getElementById('passport-capture-area');
-        try {
-            const dataUrl = await htmlToImage.toPng(area, { pixelRatio: 2, backgroundColor: '#0a0a1a' });
-            const link = document.createElement('a');
-            link.download = `AstroPassport_${document.getElementById('pass-firstname').value || 'User'}.png`;
-            link.href = dataUrl;
-            link.click();
-        } catch (err) {
-            console.error('Export error:', err);
-        }
-    });
+    const area = document.getElementById('passport-capture-area');
+
+    try {
+        // attendre que toutes les images soient chargées
+        const images = area.querySelectorAll('img');
+        await Promise.all(
+            [...images].map(img => {
+                if (img.complete) return Promise.resolve();
+                return new Promise(res => {
+                    img.onload = img.onerror = res;
+                });
+            })
+        );
+
+        // petit délai pour stabiliser le DOM
+        await new Promise(res => setTimeout(res, 100));
+
+        const dataUrl = await htmlToImage.toPng(area, {
+            pixelRatio: 2,
+            cacheBust: true,
+            backgroundColor: '#0a0a1a'
+        });
+
+        const link = document.createElement('a');
+        link.download = `AstroPassport_${document.getElementById('pass-firstname').value || 'User'}.png`;
+        link.href = dataUrl;
+        link.click();
+
+    } catch (err) {
+        console.error('Export error:', err);
+    }
+});
 
     updatePassportPreview();
 }
 
 function updatePassportPreview() {
+    const traitsHTML = sign.traits.slice(0, 4).map(t => `
+    <span style="
+        padding:4px 10px;
+        border-radius:20px;
+        font-size:10px;
+        background:rgba(139,92,246,0.2);
+        border:1px solid rgba(139,92,246,0.3);
+        color:#c4b5fd;
+    ">
+        ${t}
+    </span>
+`).join('');
     const fname = document.getElementById('pass-firstname').value || 'NON DÉFINI';
     const lname = document.getElementById('pass-lastname').value || 'NON DÉFINI';
     const signId = passSignSelect.value;
@@ -343,9 +376,13 @@ function updatePassportPreview() {
                         <p class="passport-value" style="font-size: 12px">${sign.rulingPlanet}</p>
                     </div>
                 </div>
-                <div class="p-3 rounded-lg italic" style="background: rgba(30, 27, 75, 0.4); border: 1px solid rgba(212, 175, 55, 0.1)">
-                    <p class="text-[11px] text-center leading-relaxed" style="color: #e2e8f0">"${sign.quote}"</p>
-                </div>
+               <div style="display:flex;flex-wrap:wrap;gap:6px;justify-content:center;">
+    ${traitsHTML}
+</div>
+
+<div class="p-3 rounded-lg italic" style="background: rgba(30, 27, 75, 0.4); border: 1px solid rgba(212, 175, 55, 0.1)">
+    <p class="text-[11px] text-center leading-relaxed" style="color: #e2e8f0">"${sign.quote}"</p>
+</div>
             </div>
 
             <div class="mt-auto pt-4 z-10 flex flex-col gap-2" style="border-top: 1px solid rgba(212, 175, 55, 0.2)">
@@ -355,7 +392,7 @@ function updatePassportPreview() {
                         ${lname.padEnd(10, '<').toUpperCase()}${fname.padEnd(10, '<').toUpperCase()}<<<<<<<<<<<<<<<<<<<< <br>
                         ${sign.name.toUpperCase()}<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
                     </p>
-                    <p class="text-[8px] italic" style="color: rgba(167, 139, 250, 0.4)">AstroGuide App</p>
+                    <p class="text-[11px] italic" style="color: rgba(167, 139, 250, 0.4)">AstroGuide App</p>
                 </div>
             </div>
         </div>
