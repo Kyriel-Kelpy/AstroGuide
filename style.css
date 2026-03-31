@@ -1,5 +1,5 @@
 :root {
-  /* Dark Theme (Default) */
+  /* Dark Theme Permanent */
   --bg-color: #0a0a1a;
   --text-color: #f3f4f6;
   --subtext-color: #c4b5fd;
@@ -10,29 +10,19 @@
   --nav-inactive: rgba(91, 33, 182, 0.25);
   --glow-color: rgba(139, 92, 246, 0.25);
   --passport-gradient: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #020617 100%);
-}
-
-[data-theme="light"] {
-  /* LIGHT MODE = ENCRE / CONTRASTE FORT */
-  --bg-color: #f4f1ea; /* papier légèrement chaud */
-  --text-color: #000000; /* noir pur */
-  --subtext-color: #1f2937; /* noir adouci */
-  --accent-color: #4c1d95; /* violet sombre */
-  --card-bg: #ede9e3; /* pas blanc, légèrement teinté */
-  --border-color: #4c1d9533;
-  --input-bg: #e7e3dc;
-  --nav-inactive: #4c1d9515;
-  --glow-color: rgba(76, 29, 149, 0.2);
-  --passport-gradient: linear-gradient(135deg, #f4f1ea 0%, #e7e3dc 50%, #ddd6ce 100%);
+  
+  /* Palette de couleurs spécifique au Passeport (Gold/Luxury) */
+  --passport-gold: #d4af37;
+  --passport-gold-muted: rgba(212, 175, 55, 0.2);
 }
 
 body {
   background-color: var(--bg-color);
   color: var(--text-color);
-  transition: background-color 0.5s, color 0.5s;
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
   min-height: 100vh;
   margin: 0;
+  overflow-x: hidden;
 }
 
 /* CARDS */
@@ -41,7 +31,7 @@ body {
   backdrop-filter: blur(10px);
   border: 1px solid var(--border-color);
   border-radius: 1.5rem;
-  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
 }
 
 /* NAV BUTTON */
@@ -49,9 +39,9 @@ body {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  padding: 0.5rem 1rem;
+  padding: 0.5rem 1.25rem;
   border-radius: 9999px;
-  transition: all 0.3s;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   font-size: 0.875rem;
   border: none;
   cursor: pointer;
@@ -60,15 +50,17 @@ body {
 .btn-nav.active {
   background-color: var(--accent-color);
   color: #ffffff;
+  box-shadow: 0 4px 12px var(--glow-color);
 }
 
 .btn-nav:not(.active) {
   background-color: var(--nav-inactive);
-  color: var(--accent-color);
+  color: var(--subtext-color);
 }
 
 .btn-nav:hover {
-  transform: scale(1.05);
+  transform: translateY(-2px);
+  background-color: rgba(124, 58, 237, 0.4);
 }
 
 /* PRIMARY BUTTON */
@@ -81,19 +73,21 @@ body {
   border: none;
   cursor: pointer;
   width: 100%;
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition: all 0.2s ease;
   box-shadow: 0 8px 20px var(--glow-color);
 }
 
 .btn-primary:hover {
-  transform: scale(1.02);
+  transform: scale(1.01);
+  filter: brightness(1.1);
+  box-shadow: 0 10px 25px rgba(124, 58, 237, 0.4);
 }
 
 .btn-primary:active {
   transform: scale(0.98);
 }
 
-/* INPUT */
+/* INPUT & SELECT */
 .input-select {
   width: 100%;
   background-color: var(--input-bg);
@@ -104,6 +98,7 @@ body {
   appearance: none;
   cursor: pointer;
   outline: none;
+  transition: border-color 0.2s;
 }
 
 .input-select:focus {
@@ -111,92 +106,88 @@ body {
   box-shadow: 0 0 0 2px var(--glow-color);
 }
 
-/* PASSPORT */
+/* PASSPORT CONTAINER */
 .passport-container {
   width: 350px;
-  height: 550px;
-  border-radius: 1rem;
+  height: 520px;
+  border-radius: 1.5rem;
   padding: 1.5rem;
   position: relative;
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  border: 1px solid #bfa14a;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
+  border: 2px solid var(--passport-gold);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
   background: var(--passport-gradient);
 }
 
 .passport-photo-box {
-  width: 7rem;
-  height: 9rem;
-  background-color: #1e1b4b;
-  border-radius: 0.5rem;
+  width: 85px;
+  height: 110px;
+  background-color: rgba(0, 0, 0, 0.3);
+  border-radius: 0.75rem;
   overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 1px solid rgba(191, 161, 74, 0.4);
+  border: 1px solid var(--passport-gold-muted);
 }
 
 /* TEXT PASSPORT */
 .passport-label {
-  font-size: 8px;
+  font-size: 7px;
   text-transform: uppercase;
-  font-weight: bold;
-  letter-spacing: 0.05em;
-  color: var(--accent-color);
-  margin-bottom: 2px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  color: var(--passport-gold);
+  margin-bottom: 1px;
+  opacity: 0.9;
 }
 
 .passport-value {
-  font-size: 14px;
-  font-weight: bold;
+  font-size: 13px;
+  font-weight: 700;
   color: #ffffff;
   margin: 0;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.3);
 }
 
-/* LIGHT MODE PASSPORT TEXT = NOIR */
-[data-theme="light"] .passport-value {
-  color: #000000;
-}
-
-[data-theme="light"] .passport-label {
-  color: #4c1d95;
-}
-
-[data-theme="light"] .passport-mrz {
-  color: #1f2937;
-}
-
-/* PHOTO BOX LIGHT */
-[data-theme="light"] .passport-photo-box {
-  background-color: #d6d3d1;
-  border: 1px solid #4c1d9533;
-}
-
-/* MRZ */
+/* MRZ (Machine Readable Zone) */
 .passport-mrz {
-  font-family: monospace;
+  font-family: 'Courier New', monospace;
   font-size: 7px;
-  color: rgba(167, 139, 250, 0.7);
-  line-height: 1.2;
+  color: rgba(255, 255, 255, 0.5);
+  line-height: 1.3;
+  letter-spacing: 1px;
 }
 
 /* ANIMATIONS */
 .fade-in {
-  animation: fadeIn 0.5s ease-out forwards;
+  animation: fadeIn 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
+  from { opacity: 0; transform: translateY(15px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* SECTIONS */
+/* SECTIONS MANAGEMENT */
 .section {
   display: none;
 }
 
 .section.active {
   display: block;
+}
+
+/* SCROLLBAR (Optionnel pour le look sombre) */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg-color);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--accent-color);
+  border-radius: 10px;
 }
