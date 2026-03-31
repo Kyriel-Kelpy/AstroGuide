@@ -13,17 +13,17 @@
 }
 
 [data-theme="light"] {
-  /* Light Theme - CONTRASTE AMÉLIORÉ */
-  --bg-color: #f8fafc;
-  --text-color: #020617; /* noir profond */
-  --subtext-color: #475569; /* gris lisible */
-  --accent-color: #5b21b6; /* violet plus foncé */
-  --card-bg: #ffffff; /* suppression transparence */
-  --border-color: rgba(91, 33, 182, 0.2);
-  --input-bg: #ffffff;
-  --nav-inactive: rgba(91, 33, 182, 0.08);
-  --glow-color: rgba(91, 33, 182, 0.15);
-  --passport-gradient: linear-gradient(135deg, #ffffff 0%, #f1f5f9 50%, #e2e8f0 100%);
+  /* LIGHT MODE = ENCRE / CONTRASTE FORT */
+  --bg-color: #f4f1ea; /* papier légèrement chaud */
+  --text-color: #000000; /* noir pur */
+  --subtext-color: #1f2937; /* noir adouci */
+  --accent-color: #4c1d95; /* violet sombre */
+  --card-bg: #ede9e3; /* pas blanc, légèrement teinté */
+  --border-color: #4c1d9533;
+  --input-bg: #e7e3dc;
+  --nav-inactive: #4c1d9515;
+  --glow-color: rgba(76, 29, 149, 0.2);
+  --passport-gradient: linear-gradient(135deg, #f4f1ea 0%, #e7e3dc 50%, #ddd6ce 100%);
 }
 
 body {
@@ -38,10 +38,10 @@ body {
 /* CARDS */
 .glass-card {
   background-color: var(--card-bg);
-  backdrop-filter: blur(12px);
+  backdrop-filter: blur(10px);
   border: 1px solid var(--border-color);
   border-radius: 1.5rem;
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.08);
 }
 
 /* NAV BUTTON */
@@ -73,8 +73,8 @@ body {
 
 /* PRIMARY BUTTON */
 .btn-primary {
-  background: linear-gradient(to right, var(--accent-color), #2563eb);
-  color: white;
+  background: linear-gradient(to right, var(--accent-color), #312e81);
+  color: #ffffff;
   font-weight: bold;
   padding: 1rem;
   border-radius: 0.75rem;
@@ -82,7 +82,7 @@ body {
   cursor: pointer;
   width: 100%;
   transition: transform 0.2s, box-shadow 0.2s;
-  box-shadow: 0 10px 20px var(--glow-color);
+  box-shadow: 0 8px 20px var(--glow-color);
 }
 
 .btn-primary:hover {
@@ -121,8 +121,8 @@ body {
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  border: 1px solid #d4af37;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4);
+  border: 1px solid #bfa14a;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
   background: var(--passport-gradient);
 }
 
@@ -135,7 +135,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 1px solid rgba(212, 175, 55, 0.3);
+  border: 1px solid rgba(191, 161, 74, 0.4);
 }
 
 /* TEXT PASSPORT */
@@ -155,22 +155,23 @@ body {
   margin: 0;
 }
 
+/* LIGHT MODE PASSPORT TEXT = NOIR */
 [data-theme="light"] .passport-value {
-  color: #020617;
+  color: #000000;
 }
 
 [data-theme="light"] .passport-label {
-  color: #5b21b6;
+  color: #4c1d95;
 }
 
 [data-theme="light"] .passport-mrz {
-  color: #475569;
+  color: #1f2937;
 }
 
 /* PHOTO BOX LIGHT */
 [data-theme="light"] .passport-photo-box {
-  background-color: #e2e8f0;
-  border: 1px solid rgba(91, 33, 182, 0.2);
+  background-color: #d6d3d1;
+  border: 1px solid #4c1d9533;
 }
 
 /* MRZ */
