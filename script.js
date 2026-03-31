@@ -277,18 +277,22 @@ function renderCompatibility(result) {
 // --- Passport Logic ---
 function setupPassport() {
     photoInput.addEventListener('change', (e) => {
-        const file = e.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                userPhoto = e.target.result;
+    const file = e.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            // Créer une image pour vérifier qu'elle est bien chargée avant de l'assigner
+            const img = new Image();
+            img.onload = () => {
+                userPhoto = e.target.result; // C'est du Base64, donc c'est sûr pour l'export
                 photoPreview.innerHTML = `<img src="${userPhoto}" class="w-full h-full object-cover">`;
                 updatePassportPreview();
             };
-            reader.readAsDataURL(file);
-        }
-    });
-
+            img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+    }
+});
     genderButtons.forEach(btn => {
         btn.addEventListener('click', () => {
             genderButtons.forEach(b => b.classList.remove('active-gender'));
