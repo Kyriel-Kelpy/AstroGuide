@@ -28,7 +28,6 @@ const downloadBtn = document.getElementById('download-passport');
 
 // --- Initialization ---
 function init() {
-    setupTheme();
     setupAudio();
     populateSelects();
     setupNavigation();
